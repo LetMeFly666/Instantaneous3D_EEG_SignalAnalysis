@@ -17,6 +17,7 @@
 
     function renderMermaid() {
         const mermaidCodeList = document.querySelectorAll("code.language-mermaid");
+        console.log("mermaidCodeList", mermaidCodeList);
         mermaidCodeList.forEach(thisMermaid => {
             const preTag = thisMermaid.parentNode;
             const newDiv = document.createElement("div");
