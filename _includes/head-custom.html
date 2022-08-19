@@ -22,8 +22,8 @@
             const preTag = thisMermaid.parentNode;
             const newDiv = document.createElement("div");
             newDiv.innerHTML = mermaid.mermaidAPI.render("mermaid", thisMermaid.innerText);
-            preTag.parentNode.removeChild(preTag);
             insertAfter(newDiv, preTag);
+            preTag.parentNode.removeChild(preTag);
         });
     }
 
