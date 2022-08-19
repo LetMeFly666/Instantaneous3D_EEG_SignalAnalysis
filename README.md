@@ -8,6 +8,7 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 + EEG: electroencephalography（脑电图学）
 + EMD: empirical mode decomposition（经验模态分解）
 + HHT: Hilbert–Huang transform（希尔伯特-黄变换）
++ HT: Hilbert transform（希尔伯特变换）
 + IMFs: intrinsic mode functions（固有模态函数）
 + IMF: intrinsic mode functions（固有模态函数）
 + SampEn: sample entropy（样本熵）
@@ -15,6 +16,10 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 + ECG: electrocardiography（心电描记术）
 + FFT: Fast Fourier Transform（快速傅里叶变换）
 + AUC ratio of α + β waves: area ratio of α + β waves (8–32 Hz) under FFT curve（快速傅立叶变换曲线下α+β波(8-32赫兹)的面积比）
++ EMG: electromyography（肌电图描记法）
++ EOG: electrooculography（眼动电图描记法）
++ ESUs: electrosurgical units（电外科装置）
++ IFFT: Inverse fast Fourier transform（快速傅里叶逆变换）
 
 ## 论文内容
 
