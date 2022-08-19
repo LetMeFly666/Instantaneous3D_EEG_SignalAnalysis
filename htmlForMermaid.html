@@ -2,7 +2,7 @@
  * @Author: LetMeFly
  * @Date: 2022-08-19 17:11:12
  * @LastEditors: LetMeFly
- * @LastEditTime: 2022-08-19 18:25:26
+ * @LastEditTime: 2022-08-19 18:44:23
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -89,12 +89,13 @@
             mermaidCodeList.forEach(thisMermaid => {
                 const preTag = thisMermaid.parentNode;
                 const newDiv = document.createElement("div");
-                newDiv.setAttribute("class", "mermaid");
-                newDiv.innerHTML = thisMermaid.innerHTML;
+                newDiv.innerHTML = mermaid.mermaidAPI.render("mermaid", thisMermaid.innerText);
                 preTag.innerText = "";
                 insertAfter(newDiv, preTag);
             });
         }
+
+        renderMermaid();
 
     </script>
 
