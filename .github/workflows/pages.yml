@@ -27,7 +27,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 每次checkout都会自动进入到/home/runner/work/AutoDelete/AutoDelete，并且把/home/runner/work/AutoDelete的所有东西重写覆盖掉！！！
+      # 每次checkout都会自动进入到/home/runner/work/Instantaneous3D_EEG_SignalAnalysis/Instantaneous3D_EEG_SignalAnalysis，并且把/home/runner/work/Instantaneous3D_EEG_SignalAnalysis的所有东西重写覆盖掉！！！
       - name: Checkout master
         uses: actions/checkout@v3
         with:
