@@ -1,3 +1,31 @@
 <script src="https://letmefly.xyz/Links/Common.js"></script>
 <script>window._LINKS_COMMONJS_NOTCHANGEICO = true;</script>
 <link type="image/x-icon" rel="shortcut icon" href="/favicon.ico">
+
+
+<script src="https://re2dfa.letmefly.xyz/mermaid.min.js"></script>
+<script>
+    function insertAfter(newTag, oldTag) {
+        const parent = oldTag.parentNode;
+        if (parent.lastChild == oldTag) {
+            parent.appendChild(newTag);
+        }
+        else {
+            parent.insertBefore(newTag, oldTag.nextSibling);
+        }
+    }
+
+    function renderMermaid() {
+        const mermaidCodeList = document.querySelectorAll("code.language-mermaid");
+        mermaidCodeList.forEach(thisMermaid => {
+            const preTag = thisMermaid.parentNode;
+            const newDiv = document.createElement("div");
+            newDiv.innerHTML = mermaid.mermaidAPI.render("mermaid", thisMermaid.innerText);
+            preTag.innerText = "";
+            insertAfter(newDiv, preTag);
+        });
+    }
+
+    renderMermaid();
+
+</script>
