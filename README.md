@@ -9,7 +9,6 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 + EMD: empirical mode decomposition（经验模态分解）
 + HHT: Hilbert–Huang transform（希尔伯特-黄变换）
 + HT: Hilbert transform（希尔伯特变换）
-+ IMFs: intrinsic mode functions（固有模态函数）
 + IMF: intrinsic mode functions（固有模态函数）
 + SampEn: sample entropy（样本熵）
 + BIS: bispectral index（脑电双频指数）
@@ -20,6 +19,24 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 + EOG: electrooculography（眼动电图描记法）
 + ESUs: electrosurgical units（电外科装置）
 + IFFT: Inverse fast Fourier transform（快速傅里叶逆变换）
+
+## 预备知识
+
+### 时域和频域
+
+时域是客观世界中唯一实际存在域；频域是一个数学构造，也被一些学者称为上帝视角。
+
+#### 时域
+
+以时间轴为坐标表示动态信号的关系
+
+#### 频域
+
+正弦波是频域中唯一存在的波形
+
+#### 转换
+
+动态信号从时间域变换到频率域主要通过傅立叶级数和傅立叶变换实现。周期信号靠傅立叶级数，非周期信号靠傅立叶变换。时域越宽，频域越短。
 
 ## 论文内容
 
@@ -38,11 +55,46 @@ EMD可以从原始EEG信号中滤除噪音相关的频率，并可以结合挑�
 ```mermaid
 graph TD
 
-1[Raw EEG signal] --> 2[Step 1.<br />Decompose into IMF]
-2 --> 3[Step 2.<br />Convert to frequency domain]
-3 --> 4[Step 3.<br />Cut off the noise]
-4 --> 5[Step 4.<br />Reverse into time domain]
-5 --> 6[Step 5.<br />Construct filtered EEG]
-6 --> 7[Step 6.<br />Obtain instantaneous frequency]
-7 --> 8[Step 7.<br />Build the 3D representation]
+0[Raw EEG signal] --> 1[Step 1.<br />Decompose into IMF]
+1 --> 2[Step 2.<br />Convert to frequency domain]
+2 --> 3[Step 3.<br />Cut off the noise]
+3 --> 4[Step 4.<br />Reverse into time domain]
+4 --> 5[Step 5.<br />Construct filtered EEG]
+5 --> 6[Step 6.<br />Obtain instantaneous frequency]
+6 --> 7[Step 7.<br />Build the 3D representation]
 ```
+
+#### step1 将原有EEG信号分解为数个IMF
+
+$$x(t)=\sum_{i=1}^{n} c_{i}(t)+r_{n}(t)$$
+
+$x(t)$是时域下的原始信号，$c_i(t)$是第$i$个IMF（固有模态函数），$r_n(t)$是残余信号。
+
+#### step2 将IMF转换到频域
+
+使用FFT将IMF从时域转换到频域。
+
+#### step3 去除每个IMF中的噪声
+
+人脑产生的脑电信号的正常频率在0.5赫兹Hz到32Hz之间，它们分别包含从低频到高频的δ，θ，α波和β波。
+
+#### step4 将IMF转回到时域
+
+使用快速傅立叶逆变换IFFT
+
+#### step5 构造滤波后的脑电信号的IMF
+
+IFFT带来的边缘效应会使前5秒和后5秒的振幅异常地高，因此去掉前5秒和后5秒。
+
+丢掉过小的IMF。
+
+#### step6 通过HHT获得实时频率
+
+δ (0.5–4 Hz), θ (4–8 Hz), α (8–16 Hz), β (16–32 Hz)
+
+Other: Noise
+
+#### step7 构建三维表示
+
+x轴：频率，y轴：时间，z轴：振幅
+
