@@ -19,6 +19,7 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 + EOG: electrooculography（眼动电图描记法）
 + ESUs: electrosurgical units（电外科装置）
 + IFFT: Inverse fast Fourier transform（快速傅里叶逆变换）
++ ApEn: approximate entropy（近似熵）
 
 ## 预备知识
 
