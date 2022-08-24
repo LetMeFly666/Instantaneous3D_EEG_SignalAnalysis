@@ -2,6 +2,9 @@
 
 Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode Decomposition and the Hilbert–Huang Transform Applied to Depth of Anaesthesia
 
++ Project URL: [http://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/](http://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/)
++ Online Address: [https://i3deegsa.letmefly.xyz/](https://i3deegsa.letmefly.xyz/)
+
 ## 名词
 
 + DoA: Depth of anaesthesia（麻醉深度）
