@@ -2,11 +2,12 @@
 Author: LetMeFly
 Date: 2022-08-25 10:50:54
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:47:34
+LastEditTime: 2022-08-25 20:13:51
 '''
 import numpy as np
 from matplotlib import pyplot as plt
 def cutoffNoise(IMFs):
+    return IMFs  # Try result
     IMFs[IMFs < 0.5] = 0
     IMFs[IMFs > 32] = 0
     fig, axes = plt.subplots(IMFs.shape[0], 1)
