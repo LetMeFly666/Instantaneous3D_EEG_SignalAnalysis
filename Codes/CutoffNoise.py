@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 10:50:54
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:24:23
+LastEditTime: 2022-08-25 19:47:34
 '''
 import numpy as np
 from matplotlib import pyplot as plt
@@ -16,4 +16,5 @@ def cutoffNoise(IMFs):
     for num, IMF in enumerate(IMFs):
         axes[num].plot(np.arange(0, 40, 0.01), IMF)
         axes[num].set_ylabel("IMF " + str(num + 1))
+    plt.show()
     return IMFs

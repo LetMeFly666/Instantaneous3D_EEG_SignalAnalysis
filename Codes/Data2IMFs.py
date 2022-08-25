@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:25:07
+LastEditTime: 2022-08-25 19:47:39
 '''
 import numpy as np
 from PyEMD import EMD  # , Visualisation
@@ -35,6 +35,8 @@ def data2IMFs(data):
         axes[num].set_ylabel("IMF " + str(num + 1))
     axes[imfs.shape[0]].plot(np.arange(0, 40, 0.01), res)
     axes[imfs.shape[0]].set_ylabel("Residue")
+
+    plt.show()
 
     # vis = Visualisation()
     # vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)

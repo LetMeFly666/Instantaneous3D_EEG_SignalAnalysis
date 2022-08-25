@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 16:25:58
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:30:56
+LastEditTime: 2022-08-25 19:47:47
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,4 +16,5 @@ def IMFs2FrequencyDomain(IMFs):
     for num, IMF in enumerate(IMFs):
         axes[num].plot(np.arange(0, 40, 0.01), IMF)
         axes[num].set_ylabel("IMF " + str(num + 1))
+    plt.show()
     return IMFs

@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 13:13:28
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:36:00
+LastEditTime: 2022-08-25 19:47:43
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,9 +18,7 @@ def IMF2TimeDomain(IMFs):
     fig, axes = plt.subplots(IMFs.shape[0], 1)
     if IMFs.shape[0] == 1:
         axes = list(axes)
-    print(IMFs.shape)
-    print(IMFs)
-    axes[0].set_title("++++++Back to time domain-----------")
+    axes[0].set_title("Back to time domain")
     for num, IMF in enumerate(IMFs):
         ax = axes[num]
         print(ax)
