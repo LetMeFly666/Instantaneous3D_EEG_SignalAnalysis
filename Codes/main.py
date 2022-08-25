@@ -2,8 +2,9 @@
 Author: LetMeFly
 Date: 2022-08-25 10:34:12
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 14:39:28
+LastEditTime: 2022-08-25 15:09:11
 '''
+import matplotlib.pyplot as plt
 from Txt2numpy import txt2numpy
 from Data2IMFs import data2IMFs
 from CutoffNoice import cutoffNoice
@@ -15,4 +16,6 @@ IMFs = data2IMFs(data)
 IMFs = cutoffNoice(IMFs=IMFs)
 IMFs = IMF2TimeDomain(IMFs=IMFs)
 EEG = ConstructEEG(IMFs=IMFs)
+
+plt.show()
 

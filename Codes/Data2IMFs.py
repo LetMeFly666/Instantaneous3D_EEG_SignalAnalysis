@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 13:25:55
+LastEditTime: 2022-08-25 15:08:16
 '''
 import numpy as np
 from PyEMD import EMD, Visualisation
@@ -32,9 +32,9 @@ def data2IMFs(data):
     #imfs, res = components[:-1], components[-1]
 
     #  # TODO: visualisation
-    # vis = Visualisation()
-    # vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
-    # vis.plot_instant_freq(t, imfs=imfs)
+    vis = Visualisation()
+    vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
+    vis.plot_instant_freq(t, imfs=imfs)
     # vis.show()
 
     return imfs
