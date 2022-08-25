@@ -4,7 +4,6 @@ Date: 2022-08-25 10:34:12
 LastEditors: LetMeFly
 LastEditTime: 2022-08-25 20:21:26
 '''
-import matplotlib.pyplot as plt
 from Txt2numpy import txt2numpy
 from ShowOriginalEEGdata import showOriginalEEGdata
 from Data2IMFs import data2IMFs

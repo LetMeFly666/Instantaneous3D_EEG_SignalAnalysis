@@ -2,11 +2,11 @@
 Author: LetMeFly
 Date: 2022-08-25 13:34:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 20:12:04
+LastEditTime: 2022-08-25 21:42:43
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from ShowIMFs import showIMFs
+from Visualize import showIMFs
 
 def ConstructEEG(IMFs):
     # 丢掉国小的IMF
