@@ -102,3 +102,8 @@ Other: Noise
 
 x轴：频率，y轴：时间，z轴：振幅
 
+## 实现
+
+1. ```Codes/Data2IMFs.py```将数据分成很多IMF
+2. ```Codes/Txt2numpy.py```将.txt读入numpy
+3. ```Codes/CutoffNoice.py```将信号中不符合
