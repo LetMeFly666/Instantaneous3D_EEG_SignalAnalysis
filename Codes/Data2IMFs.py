@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:09:52
+LastEditTime: 2022-08-25 19:25:07
 '''
 import numpy as np
 from PyEMD import EMD  # , Visualisation
@@ -29,7 +29,7 @@ def data2IMFs(data):
     fig, axes = plt.subplots(imfs.shape[0] + 1, 1)
     if imfs.shape[0] == 1:
         axes = list(axes)
-    axes[0].set_title("The IMFs.")
+    axes[0].set_title("The IMFs")
     for num, IMF in enumerate(imfs):
         axes[num].plot(np.arange(0, 40, 0.01), IMF)
         axes[num].set_ylabel("IMF " + str(num + 1))
