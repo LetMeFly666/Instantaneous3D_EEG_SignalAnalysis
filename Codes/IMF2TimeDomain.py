@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 13:13:28
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:47:43
+LastEditTime: 2022-08-25 19:49:01
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,9 +20,7 @@ def IMF2TimeDomain(IMFs):
         axes = list(axes)
     axes[0].set_title("Back to time domain")
     for num, IMF in enumerate(IMFs):
-        ax = axes[num]
-        print(ax)
-        
+        ax = axes[num]        
         ax.plot(np.arange(0, 40, 0.01), IMF)
         ax.set_ylabel("IMF " + str(num + 1))
     
