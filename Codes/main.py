@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 10:34:12
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:48:23
+LastEditTime: 2022-08-25 20:21:26
 '''
 import matplotlib.pyplot as plt
 from Txt2numpy import txt2numpy
@@ -12,6 +12,7 @@ from IMFs2FrequencyDomain import IMFs2FrequencyDomain
 from CutoffNoise import cutoffNoise
 from IMF2TimeDomain import IMF2TimeDomain
 from ConstructEEG import ConstructEEG
+from HHT import HHT
 
 import os
 # 取消QT警告
@@ -26,4 +27,5 @@ IMFs = data2IMFs(EEG)  # step1.将EEG数据转换为IMF
 IMFs = IMFs2FrequencyDomain(IMFs=IMFs)  # step2.将IMF转换到频域
 IMFs = cutoffNoise(IMFs=IMFs)  # step3.去除每个IMF中的噪声
 IMFs = IMF2TimeDomain(IMFs=IMFs)  # step4.转回到时域
-EEG = ConstructEEG(IMFs=IMFs)
+EEG = ConstructEEG(IMFs=IMFs)  # step5.选取有效范围的IMF并构建EEG
+instantaneousFrequency = HHT(EEG)
