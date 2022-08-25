@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 10:34:12
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:24:19
+LastEditTime: 2022-08-25 19:25:51
 '''
 import matplotlib.pyplot as plt
 from Txt2numpy import txt2numpy
@@ -25,7 +25,7 @@ showOriginalEEGdata(EEG)  # 显示原本EEG文件
 IMFs = data2IMFs(EEG)  # step1.将EEG数据转换为IMF
 IMFs = IMFs2FrequencyDomain(IMFs=IMFs)  # step2.将IMF转换到频域
 IMFs = cutoffNoise(IMFs=IMFs)  # step3.去除每个IMF中的噪声
-IMFs = IMF2TimeDomain(IMFs=IMFs)
+IMFs = IMF2TimeDomain(IMFs=IMFs)  # step4.转回到时域
 EEG = ConstructEEG(IMFs=IMFs)
 
 plt.show()
