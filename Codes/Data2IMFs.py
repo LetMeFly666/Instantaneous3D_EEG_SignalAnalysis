@@ -2,24 +2,19 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 15:08:16
+LastEditTime: 2022-08-25 16:52:05
 '''
 import numpy as np
-from PyEMD import EMD, Visualisation
-import os
+from PyEMD import EMD  # , Visualisation
+from matplotlib import pyplot as plt
 
 
 def data2IMFs(data):
-    os.environ["QT_DEVICE_PIXEL_RATIO"] = "0"
-    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-    os.environ["QT_SCREEN_SCALE_FACTORS"] = "1"
-    os.environ["QT_SCALE_FACTOR"] = "1"
 
     t = np.arange(0, 40, 0.01)
-    print(t)
-    print(t.shape)
-    # S = np.sin(13*t + 0.2*t**1.4) - np.cos(3*t)
-    print(data.shape)
+    # print(t)
+    # print(t.shape)
+    # print(data.shape)
 
     # Extract imfs and residue
     # In case of EMD
@@ -31,10 +26,18 @@ def data2IMFs(data):
     #components = EEMD()(S)
     #imfs, res = components[:-1], components[-1]
 
-    #  # TODO: visualisation
-    vis = Visualisation()
-    vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
-    vis.plot_instant_freq(t, imfs=imfs)
+    fig, axes = plt.subplots(imfs.shape[0], 1)
+    if imfs.shape[0] == 1:
+        axes = list(axes)
+    axes[0].set_title("The IMFs.")
+    for num, IMF in enumerate(imfs):
+        axes[num].plot(np.arange(0, 40, 0.01), IMF)
+        axes[num].set_ylabel("IMF " + str(num + 1))
+
+
+    # vis = Visualisation()
+    # vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
+    # vis.plot_instant_freq(t, imfs=imfs)
     # vis.show()
 
     return imfs

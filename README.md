@@ -104,7 +104,7 @@ x轴：频率，y轴：时间，z轴：振幅
 
 ## 实现
 
-1. ```Codes/Data2IMFs.py```将数据分成很多IMF
+1. ```Codes/Data2IMFs.py```将数据分成很多IMF、将IMF转换到频域
 2. ```Codes/Txt2numpy.py```将.txt读入numpy
 3. ```Codes/CutoffNoice.py```将信号中不符合频率范围的部分删除
 4. ```Codes/IMF2TimeDomain.py```将IMF转回时域
