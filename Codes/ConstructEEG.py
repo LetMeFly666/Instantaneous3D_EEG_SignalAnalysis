@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 13:34:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 15:08:06
+LastEditTime: 2022-08-25 19:49:39
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +14,6 @@ def ConstructEEG(IMFs):
     ax = plt.subplot()
     ax.set_title('Construct EEG')
     ax.plot(np.arange(0, 30, 0.01), EEG)
-    # plt.show()
+    plt.show()
     return EEG
     
