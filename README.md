@@ -116,3 +116,5 @@ TODO: Update this
 ## TODO:
 
 + 多种时间的文件的支持（现在只能是固定的4000个数据，并且程序中很多位置使用了绝对值，不好）
+
+<!-- Get-ChildItem Env: | Select Name | Export-Csv -Path C:/Users/LetMe/Desktop/tmp.txt -NoTypeInformation -->
