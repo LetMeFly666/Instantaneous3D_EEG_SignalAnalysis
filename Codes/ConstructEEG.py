@@ -30,8 +30,6 @@ def ConstructEEG(IMFs):
 
     EEG = IMFs.sum(axis=0)
     # EEG = EEG[1000:]
-    print(EEG)
-    print(EEG.shape)
     ax = plt.subplot()
     ax.set_title('Construct EEG')
     ax.plot(np.arange(0, end - start, 0.01), EEG)

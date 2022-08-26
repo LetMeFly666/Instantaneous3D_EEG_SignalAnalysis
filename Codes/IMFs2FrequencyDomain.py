@@ -2,13 +2,12 @@
 Author: LetMeFly
 Date: 2022-08-25 16:25:58
 LastEditors: LetMeFly
-LastEditTime: 2022-08-26 11:07:41
+LastEditTime: 2022-08-26 20:02:35
 '''
 import numpy as np
 from Visualize import showIMFs
 def IMFs2FrequencyDomain(IMFs):
     for i in range(len(IMFs)):
-        print(i)
         IMFs[i] = np.fft.fft(IMFs[i])
     
     showIMFs(IMFs, 0, 40, "Change IMFs into frequency domain")
