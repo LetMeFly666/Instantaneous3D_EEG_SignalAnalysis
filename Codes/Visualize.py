@@ -2,9 +2,8 @@
 Author: LetMeFly
 Date: 2022-08-25 20:02:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 21:45:15
+LastEditTime: 2022-08-26 08:50:25
 '''
-from tkinter.messagebox import NO
 import numpy as np
 from matplotlib import pyplot as plt
 
