@@ -104,13 +104,18 @@ x轴：频率，y轴：时间，z轴：振幅
 
 ## 实现
 
-TODO: Update this
-
-1. ```Codes/Data2IMFs.py```将数据分成很多IMF、将IMF转换到频域
-2. ```Codes/Txt2numpy.py```将.txt读入numpy
-3. ```Codes/CutoffNoice.py```将信号中不符合频率范围的部分删除
-4. ```Codes/IMF2TimeDomain.py```将IMF转回时域
-5. ```Codes/ConstructEEG.py```将IMF构建回EEG（并去除前10s的信号）
++ ```Codes/main.py```：主程序，主要负责调用
++ ```Codes/BaseClass.py```：数据类，包括数据、起始截止时间、采样频率等
++ ```Codes/Visualize.py```：将数据可视化
++ ```Codes/Txt2numpy.py```：读取数据
++ ```Codes/ShowOriginalEEGdata.py```：显示原始EEG
++ ```Codes/Data2IMFs.py```：将数据分成很多IMF、将IMF转换到频域
++ ```Codes/IMFs2FrequencyDomain.py```：将IMF转换到频域
++ ```Codes/CutoffNoice.py```：将信号中不符合频率范围的部分删除
++ ```Codes/IMF2TimeDomain.py```：将IMF转回时域
++ ```Codes/ConstructEEG.py```：将IMF构建回EEG（并去除前10s的信号）
++ ```Codes/HHT.py```：通过HHT获得实时频率
++ ```Codes/ShowRealtime3D.py```：显示为实时三维图
 
 
 ## TODO:
