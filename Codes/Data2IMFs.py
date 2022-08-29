@@ -2,10 +2,10 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 10:50:10
+LastEditTime: 2022-08-29 21:19:10
 '''
 import numpy as np
-from PyEMD import EMD  # , Visualisation
+from LetEMD import EMD  # , Visualisation
 from matplotlib import pyplot as plt
 from BaseClass import Data
 
