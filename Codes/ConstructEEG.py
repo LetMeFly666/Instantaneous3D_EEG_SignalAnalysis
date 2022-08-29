@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 13:34:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 11:12:10
+LastEditTime: 2022-08-29 16:12:27
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,13 +18,15 @@ def ConstructEEG(IMFs: Data) -> Data:
     #     avg = IMFs[i].mean()  # 均值
     #     var = IMFs[i].var()  # 方差
     #     print(avg, var)
-    start = IMFs.getStartTime() + 2
-    end = IMFs.getEndTime() - 2
-    IMFs.startTime = start
-    IMFs.endTime = end
-    IMFs.data = IMFs.data[:, 2 * IMFs.getFPS() : IMFs.getDataLength() - 2 * IMFs.getFPS()]
-    IMFs.dataLength = IMFs.getDataLength()
-    # TODO: subdata()函数
+
+    # start = IMFs.getStartTime() + 2
+    # end = IMFs.getEndTime() - 2
+    # IMFs.startTime = start
+    # IMFs.endTime = end
+    # IMFs.data = IMFs.data[:, 2 * IMFs.getFPS() : IMFs.getDataLength() - 2 * IMFs.getFPS()]
+    # IMFs.dataLength = IMFs.getDataLength()
+    
+    IMFs.setSubDataByPoints(200, 200)
 
     showIMFs(IMFs, "Remove edge effects data")
 

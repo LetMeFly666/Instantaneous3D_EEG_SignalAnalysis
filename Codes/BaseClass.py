@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-29 09:39:46
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 10:46:30
+LastEditTime: 2022-08-29 16:20:58
 '''
 import numpy as np
 
@@ -34,6 +34,8 @@ class Data():
             getEndTime() -> float: 获取数据的结束采样时间
             getFPS() -> int: 获取数据的采样频率
             getTimeRangeArray() -> np.ndarray:  获取时间的数组（数组中为所有的采样时刻）
+            setSubDataByPoints(frontSkippedPoints: int, backSkippedPoints: int) -> None:  设置数据为子数据（通过采样点来设置）
+            setSubDataByTime(frontSkippedTime: float, backSkippedTime: float) -> None:  设置数据为子数据（通过时间来设置）
     
     构造函数的参数
     ====
@@ -71,6 +73,22 @@ class Data():
     def getTimeRangeArray(self) -> int:
         # TODO: 是否会有由于精度问题导致的BUG
         return np.arange(self.getStartTime(), self.getEndTime(), 1 / self.getFPS())
+    
+    def setSubDataByPoints(self, frontSkippedPoints: int, backSkippedPoints: int) -> None:
+        originalDataLength = self.getDataLength()
+        if len(self.data.shape) == 1:
+            self.data = self.data[frontSkippedPoints : originalDataLength - backSkippedPoints]
+        else:
+            self.data = self.data[:, frontSkippedPoints : originalDataLength - backSkippedPoints]
+        self.dataLength = self.getDataLength()
+        self.startTime += frontSkippedPoints / self.getFPS()
+        self.endTime -= backSkippedPoints / self.getFPS()
+        print("dataLength:", self.getDataLength())
+        print("startTime:", self.getStartTime())
+        print("endTime:", self.getEndTime())
+    
+    def setSubDataByTime(self, frontSkippedTime: float, backSkippedTime: float) -> None:
+        self.setSubDataByPoints(int(frontSkippedTime * self.getFPS()), int(backSkippedTime * self.getFPS()))
 
 
 if __name__ == "__main__":
