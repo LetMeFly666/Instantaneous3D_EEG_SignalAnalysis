@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 20:02:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 16:32:59
+LastEditTime: 2022-08-29 16:51:12
 '''
 import numpy as np
 from matplotlib import pyplot as plt
@@ -28,13 +28,14 @@ def showEEG(EEG: Data, title="EEG") -> None:
     plt.show()
 
 
+# https://www.jb51.net/article/258747.htm
 def show3d(A: Data, F: Data):
     x_A = A
     y_time = A.getTimeRangeArray()
     z_F = F
 
     fig = plt.figure()
-    ax = fig.add_subplot(111,projection='3d')
+    ax = fig.add_subplot(111, projection='3d')
     im = ax.scatter(x_A.data, y_time, z_F.data, s=1)  # s: 点的大小
     ax.set_xlabel("x_A")
     ax.set_ylabel("y_time")
