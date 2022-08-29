@@ -46,41 +46,12 @@ def cubic_spline_3pts(x, y, T):
     return t, q
 
 
-def smallest_inclusive_dtype(ref_dtype: np.dtype, ref_value) -> np.dtype:
-    if np.issubdtype(ref_dtype, np.integer):
-        for dtype in [np.uint16, np.uint32, np.uint64]:
-            if ref_value < np.iinfo(dtype).max:
-                return dtype
-        max_val = np.iinfo(np.uint32).max
-        raise ValueError("Requested too large integer range. Exceeds max( uint64 ) == '{}.".format(max_val))
-
-    # Integer path
-    if np.issubdtype(ref_dtype, np.floating):
-        for dtype in [np.float16, np.float32, np.float64]:
-            if ref_value < np.finfo(dtype).max:
-                return dtype
-        max_val = np.finfo(np.float64).max
-        raise ValueError("Requested too large integer range. Exceeds max( float64 ) == '{}.".format(max_val))
-
-    raise ValueError("Unsupported dtype '{}'. Only intX and floatX are supported.".format(ref_dtype))
-
-
-def get_timeline(range_max: int, dtype: Optional[np.dtype] = None) -> np.ndarray:
-
-    timeline = np.arange(0, range_max, dtype=dtype)
-    if timeline[-1] != range_max - 1:
-        inclusive_dtype = smallest_inclusive_dtype(timeline.dtype, range_max)
-        timeline = np.arange(0, range_max, dtype=inclusive_dtype)
-    return timeline
-
-
 def akima(X, Y, x):
     spl = Akima1DInterpolator(X, Y)
     return spl(x)
 
 class EMD:
-
-    def __init__(self, spline_kind: str = "cubic", nbsym: int = 2, **kwargs):
+    def __init__(self, nbsym: int = 2, **kwargs):
         self.energy_ratio_thr = float(kwargs.get("energy_ratio_thr", 0.2))
         self.std_thr = float(kwargs.get("std_thr", 0.2))
         self.svar_thr = float(kwargs.get("svar_thr", 0.001))
@@ -90,12 +61,7 @@ class EMD:
         self.nbsym = int(kwargs.get("nbsym", nbsym))
         self.scale_factor = float(kwargs.get("scale_factor", 1.0))
 
-        self.spline_kind = spline_kind
         self.extrema_detection = kwargs.get("extrema_detection", "simple")  # simple, parabol
-        assert self.extrema_detection in (
-            "simple",
-            "parabol",
-        ), "Only 'simple' and 'parabol' values supported"
 
         self.DTYPE = kwargs.get("DTYPE", np.float64)
         self.FIXE = int(kwargs.get("FIXE", 0))
@@ -114,7 +80,7 @@ class EMD:
         self, T: np.ndarray, S: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         
-        ext_res = self.find_extrema(T, S)
+        ext_res = self._find_extrema_simple(T, S)
         max_pos, max_val = ext_res[0], ext_res[1]
         min_pos, min_val = ext_res[2], ext_res[3]
 
@@ -351,9 +317,6 @@ class EMD:
             else:
                 lmin = ind_min[0 : min(end_min, nbsym)][::-1]
 
-            if lsym == 0:
-                raise Exception("Left edge BUG")
-
             lsym = 0
             tlmin = 2 * T[lsym] - T[lmin]
             tlmax = 2 * T[lsym] - T[lmax]
@@ -363,9 +326,6 @@ class EMD:
                 rmax = ind_max[max(end_max - nbsym, 0) :][::-1]
             else:
                 rmin = ind_min[max(end_min - nbsym, 0) :][::-1]
-
-            if rsym == len(S) - 1:
-                raise Exception("Right edge BUG")
 
             rsym = len(S) - 1
             trmin = 2 * T[rsym] - T[rmin]
@@ -393,41 +353,11 @@ class EMD:
         return max_extrema, min_extrema
 
     def spline_points(self, T: np.ndarray, extrema: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Constructs spline over given points.
-
-        Parameters
-        ----------
-        T : numpy array
-            Position or time array.
-        extrema : numpy array
-            Position (1st row) and values (2nd row) of points.
-
-        Returns
-        -------
-        T : numpy array
-            Position array (same as input).
-        spline : numpy array
-            Spline array over given positions T.
-        """
-
-        kind = self.spline_kind.lower()
         t = T[np.r_[T >= extrema[0, 0]] & np.r_[T <= extrema[0, -1]]]
-
-        if kind == "akima":
-            return t, akima(extrema[0], extrema[1], t)
-
-        elif kind == "cubic":
-            if extrema.shape[1] > 3:
-                return t, interp1d(extrema[0], extrema[1], kind=kind)(t)
-            else:
-                return cubic_spline_3pts(extrema[0], extrema[1], t)
-
-        elif kind in ["slinear", "quadratic", "linear"]:
-            return T, interp1d(extrema[0], extrema[1], kind=kind)(t).astype(self.DTYPE)
-
+        if extrema.shape[1] > 3:
+            return t, interp1d(extrema[0], extrema[1], kind="cubic")(t)
         else:
-            raise ValueError("No such interpolation method!")
+            return cubic_spline_3pts(extrema[0], extrema[1], t)
 
     @staticmethod
     def _not_duplicate(S: np.ndarray) -> np.ndarray:
@@ -449,97 +379,6 @@ class EMD:
         idx[1:-1] = not_dup_idx
 
         return idx
-
-    def find_extrema(self, T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
-        """
-        Returns extrema (minima and maxima) for given signal S.
-        Detection and definition of the extrema depends on
-        ``extrema_detection`` variable, set on initiation of EMD.
-
-        Parameters
-        ----------
-        T : numpy array
-            Position or time array.
-        S : numpy array
-            Input data S(T).
-
-        Returns
-        -------
-        local_max_pos : numpy array
-            Position of local maxima.
-        local_max_val : numpy array
-            Values of local maxima.
-        local_min_pos : numpy array
-            Position of local minima.
-        local_min_val : numpy array
-            Values of local minima.
-        """
-        if self.extrema_detection == "parabol":
-            return self._find_extrema_parabol(T, S)
-        elif self.extrema_detection == "simple":
-            return self._find_extrema_simple(T, S)
-        else:
-            raise ValueError("Incorrect extrema detection type. Please try: 'simple' or 'parabol'.")
-
-    def _find_extrema_parabol(self, T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
-        """
-        Performs parabol estimation of extremum, i.e. an extremum is a peak
-        of parabol spanned on 3 consecutive points, where the mid point is
-        the closest.
-
-        See :meth:`EMD.find_extrema()`.
-        """
-        # Finds indexes of zero-crossings
-        S1, S2 = S[:-1], S[1:]
-        indzer = np.nonzero(S1 * S2 < 0)[0]
-        if np.any(S == 0):
-            indz = np.nonzero(S == 0)[0]
-            if np.any(np.diff(indz) == 1):
-                zer = S == 0
-                dz = np.diff(np.append(np.append(0, zer), 0))
-                debz = np.nonzero(dz == 1)[0]
-                finz = np.nonzero(dz == -1)[0] - 1
-                indz = np.round((debz + finz) / 2.0)
-
-            indzer = np.sort(np.append(indzer, indz))
-
-        dt = float(T[1] - T[0])
-        scale = 2.0 * dt * dt
-
-        idx = self._not_duplicate(S)
-        T = T[idx]
-        S = S[idx]
-
-        # p - previous
-        # 0 - current
-        # n - next
-        Tp, T0, Tn = T[:-2], T[1:-1], T[2:]
-        Sp, S0, Sn = S[:-2], S[1:-1], S[2:]
-        # a = Sn + Sp - 2*S0
-        # b = 2*(Tn+Tp)*S0 - ((Tn+T0)*Sp+(T0+Tp)*Sn)
-        # c = Sp*T0*Tn -2*Tp*S0*Tn + Tp*T0*Sn
-        TnTp, T0Tn, TpT0 = Tn - Tp, T0 - Tn, Tp - T0
-        scale = Tp * Tn * Tn + Tp * Tp * T0 + T0 * T0 * Tn - Tp * Tp * Tn - Tp * T0 * T0 - T0 * Tn * Tn
-
-        a = T0Tn * Sp + TnTp * S0 + TpT0 * Sn
-        b = (S0 - Sn) * Tp ** 2 + (Sn - Sp) * T0 ** 2 + (Sp - S0) * Tn ** 2
-        c = T0 * Tn * T0Tn * Sp + Tn * Tp * TnTp * S0 + Tp * T0 * TpT0 * Sn
-
-        a = a / scale
-        b = b / scale
-        c = c / scale
-        a[a == 0] = 1e-14
-        tVertex = -0.5 * b / a
-        idx = np.r_[tVertex < T0 + 0.5 * (Tn - T0)] & np.r_[tVertex >= T0 - 0.5 * (T0 - Tp)]
-
-        a, b, c = a[idx], b[idx], c[idx]
-        tVertex = tVertex[idx]
-        sVertex = a * tVertex * tVertex + b * tVertex + c
-
-        local_max_pos, local_max_val = tVertex[a < 0], sVertex[a < 0]
-        local_min_pos, local_min_val = tVertex[a > 0], sVertex[a > 0]
-
-        return local_max_pos, local_max_val, local_min_pos, local_min_val, indzer
 
     @staticmethod
     def _find_extrema_simple(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
@@ -650,13 +489,7 @@ class EMD:
 
         return False
 
-    def check_imf(
-        self,
-        imf_new: np.ndarray,
-        imf_old: np.ndarray,
-        eMax: np.ndarray,
-        eMin: np.ndarray,
-    ) -> bool:
+    def check_imf(self, imf_new: np.ndarray, imf_old: np.ndarray, eMax: np.ndarray, eMin: np.ndarray) -> bool:
         """
         Huang criteria for **IMF** (similar to Cauchy convergence test).
         Signal is an IMF if consecutive siftings do not affect signal
@@ -711,16 +544,8 @@ class EMD:
         return (t - t[0]) / np.min(d)
 
     def emd(self, S: np.ndarray, T: Optional[np.ndarray] = None, max_imf: int = -1) -> np.ndarray:
-        if T is not None and len(S) != len(T):
-            raise ValueError("Time series have different sizes: len(S) -> {} != {} <- len(T)".format(len(S), len(T)))
-
-        if T is None or self.extrema_detection == "simple":
-            T = get_timeline(len(S), S.dtype)
-
-        # Normalize T so that it doesn't explode
+        T = np.arange(0, len(S), dtype=S.dtype)
         T = self._normalize_time(T)
-
-        # Make sure same types are dealt
         S, T = self._common_dtype(S, T)
         self.DTYPE = S.dtype
         N = len(S)
@@ -729,10 +554,6 @@ class EMD:
         imf = np.zeros(len(S), dtype=self.DTYPE)
         imf_old = np.nan
 
-        if S.shape != T.shape:
-            raise ValueError("Position or time array should be the same size as signal.")
-
-        # Create arrays
         imfNo = 0
         extNo = -1
         IMF = np.empty((imfNo, N))  # Numpy container for IMF
@@ -753,7 +574,7 @@ class EMD:
                 if n >= self.MAX_ITERATION:
                     break
 
-                ext_res = self.find_extrema(T, imf)
+                ext_res = self._find_extrema_simple(T, imf)
                 max_pos, min_pos, indzer = ext_res[0], ext_res[2], ext_res[4]
                 extNo = len(min_pos) + len(max_pos)
                 nzm = len(indzer)
@@ -774,7 +595,7 @@ class EMD:
                     # Fix number of iterations after number of zero-crossings
                     # and extrema differ at most by one.
                     elif self.FIXE_H:
-                        tmp_residue = self.find_extrema(T, imf)
+                        tmp_residue = self._find_extrema_simple(T, imf)
                         max_pos, min_pos, ind_zer = (
                             tmp_residue[0],
                             tmp_residue[2],
@@ -795,7 +616,7 @@ class EMD:
 
                     # Stops after default stopping criteria are met
                     else:
-                        ext_res = self.find_extrema(T, imf)
+                        ext_res = self._find_extrema_simple(T, imf)
                         max_pos, _, min_pos, _, ind_zer = ext_res
                         extNo = len(max_pos) + len(min_pos)
                         nzm = len(ind_zer)
@@ -837,16 +658,4 @@ class EMD:
         return IMF
 
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
-        if self.imfs is None or self.residue is None:
-            raise ValueError("No IMF found. Please, run EMD method or its variant first.")
         return self.imfs, self.residue
-
-    def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
-        if self.imfs is None or self.residue is None:
-            raise ValueError("No IMF found. Please, run EMD method or its variant first.")
-
-        imfs, residue = self.get_imfs_and_residue()
-        if np.allclose(residue, 0):
-            return imfs[:-1].copy(), imfs[-1].copy()
-        else:
-            return imfs, residue
