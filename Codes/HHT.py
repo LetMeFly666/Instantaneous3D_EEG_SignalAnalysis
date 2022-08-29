@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 20:21:32
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 16:46:36
+LastEditTime: 2022-08-29 20:50:03
 '''
 # %matplotlib inline
 from scipy.signal import hilbert
@@ -19,8 +19,8 @@ def HHT(EEG: Data) -> Data:
     instantaneousFrequency = (np.diff(instantaneous_phase) / (2.0 * np.pi) * EEG.getFPS())
     # 上面instantaneousFrequency.shape = (3599,)
     instantaneousFrequency = np.append(instantaneousFrequency, 0)
-    print(instantaneousFrequency)
-    print(instantaneousFrequency.shape)
+    # print(instantaneousFrequency)
+    # print(instantaneousFrequency.shape)
 
     instantaneousFrequency = Data(instantaneousFrequency, EEG.getStartTime(), EEG.getFPS())
     showEEG(instantaneousFrequency, "HHT")

@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 20:02:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 20:22:00
+LastEditTime: 2022-08-29 21:05:00
 '''
 import numpy as np
 from matplotlib import pyplot as plt
@@ -29,14 +29,36 @@ def showEEG(EEG: Data, title="EEG") -> None:
 
 
 # https://www.jb51.net/article/258747.htm
-def show3d(F: Data, A: Data):
+def show3d(F: Data, A: Data, ColorfulAndResize=False):
     x_F = F
     y_time = A.getTimeRangeArray()
     z_A = A
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    im = ax.scatter(np.abs(x_F.data), y_time, np.abs(z_A.data), s=1)  # s: 点的大小
+
+    if ColorfulAndResize:
+        colors = []
+        for f in x_F.data:
+            if f < 0.5:
+                colors.append("red")
+            elif f < 4:
+                colors.append("blue")
+            elif f < 8:
+                colors.append("yellow")
+            elif f < 16:
+                colors.append("green")
+            elif f < 32:
+                colors.append("pink")
+            else:
+                colors.append("red")
+        im = ax.scatter(np.abs(x_F.data), y_time, np.abs(z_A.data), c=colors, s=1)  # s: 点的大小
+        ax.set_zlim(0, 1000)
+        ax.set_title("Colorful & Resize")
+    else:
+        im = ax.scatter(np.abs(x_F.data), y_time, np.abs(z_A.data), s=1)  # s: 点的大小
+        
+
     ax.set_xlabel("x_F")
     ax.set_ylabel("y_time")
     ax.set_zlabel("z_A")
