@@ -2,20 +2,21 @@
 Author: LetMeFly
 Date: 2022-08-25 16:25:58
 LastEditors: LetMeFly
-LastEditTime: 2022-08-27 21:47:41
+LastEditTime: 2022-08-29 10:52:29
 '''
 from scipy.fftpack import fft
 import numpy as np
 from Visualize import showIMFs
+from BaseClass import Data
 
-def IMFs2FrequencyDomain(IMFs):
-    for num, IMF in enumerate(IMFs):
+def IMFs2FrequencyDomain(IMFs: Data):
+    for num, IMF in enumerate(IMFs.getData()):
         frequency = fft(IMF)
         magnitude = np.abs(frequency)
         phase = np.angle(frequency)
-        IMFs[num] = magnitude
+        IMFs.data[num] = magnitude
 
-    showIMFs(IMFs, 0, 40, "Change IMFs into frequency domain")    
+    showIMFs(IMFs, "Change IMFs into frequency domain")    
     return IMFs
 
 # import numpy as np

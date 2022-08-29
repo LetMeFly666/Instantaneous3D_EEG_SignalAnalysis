@@ -2,16 +2,17 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-25 19:47:39
+LastEditTime: 2022-08-29 10:50:10
 '''
 import numpy as np
 from PyEMD import EMD  # , Visualisation
 from matplotlib import pyplot as plt
+from BaseClass import Data
 
 
-def data2IMFs(data):
+def data2IMFs(data: Data):
 
-    t = np.arange(0, 40, 0.01)
+    # t = np.arange(0, 40, 0.01)
     # print(t)
     # print(t.shape)
     # print(data.shape)
@@ -19,7 +20,7 @@ def data2IMFs(data):
     # Extract imfs and residue
     # In case of EMD
     emd = EMD()
-    emd.emd(data)
+    emd.emd(data.getData())
     imfs, res = emd.get_imfs_and_residue()
 
     # In general:
@@ -31,9 +32,9 @@ def data2IMFs(data):
         axes = list(axes)
     axes[0].set_title("The IMFs")
     for num, IMF in enumerate(imfs):
-        axes[num].plot(np.arange(0, 40, 0.01), IMF)
+        axes[num].plot(data.getTimeRangeArray(), IMF)
         axes[num].set_ylabel("IMF " + str(num + 1))
-    axes[imfs.shape[0]].plot(np.arange(0, 40, 0.01), res)
+    axes[imfs.shape[0]].plot(data.getTimeRangeArray(), res)
     axes[imfs.shape[0]].set_ylabel("Residue")
 
     plt.show()
@@ -43,5 +44,5 @@ def data2IMFs(data):
     # vis.plot_instant_freq(t, imfs=imfs)
     # vis.show()
 
-    return imfs
+    return Data(imfs, data.getStartTime(), data.getFPS())
 
