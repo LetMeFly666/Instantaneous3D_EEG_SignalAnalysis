@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 20:02:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 11:12:59
+LastEditTime: 2022-08-29 16:32:59
 '''
 import numpy as np
 from matplotlib import pyplot as plt
@@ -28,10 +28,10 @@ def showEEG(EEG: Data, title="EEG") -> None:
     plt.show()
 
 
-def show3d(x: Data, y: Data):
-    x_A = x
-    y_time = x.getTimeRangeArray()
-    z_F = y
+def show3d(A: Data, F: Data):
+    x_A = A
+    y_time = A.getTimeRangeArray()
+    z_F = F
 
     fig = plt.figure()
     ax = fig.add_subplot(111,projection='3d')

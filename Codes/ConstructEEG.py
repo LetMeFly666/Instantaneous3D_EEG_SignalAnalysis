@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-25 13:34:22
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 16:12:27
+LastEditTime: 2022-08-29 16:33:32
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,7 +31,7 @@ def ConstructEEG(IMFs: Data) -> Data:
     showIMFs(IMFs, "Remove edge effects data")
 
     # 丢弃过小的IMF
-    IMFs.data = IMFs.data[:6]  # TODO: 如果不足6个
+    IMFs.data = IMFs.data[:6]
     showIMFs(IMFs, "Desert small IMFs")
 
 
@@ -44,4 +44,3 @@ def ConstructEEG(IMFs: Data) -> Data:
     # ax.plot(np.arange(0, end - start, 0.01), EEG)
     # plt.show()
     return EEG
-    
