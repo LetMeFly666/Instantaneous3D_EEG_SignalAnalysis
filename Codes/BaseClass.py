@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-29 09:39:46
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 16:20:58
+LastEditTime: 2022-08-29 16:24:42
 '''
 import numpy as np
 
@@ -83,9 +83,9 @@ class Data():
         self.dataLength = self.getDataLength()
         self.startTime += frontSkippedPoints / self.getFPS()
         self.endTime -= backSkippedPoints / self.getFPS()
-        print("dataLength:", self.getDataLength())
-        print("startTime:", self.getStartTime())
-        print("endTime:", self.getEndTime())
+        # print("dataLength:", self.getDataLength())
+        # print("startTime:", self.getStartTime())
+        # print("endTime:", self.getEndTime())
     
     def setSubDataByTime(self, frontSkippedTime: float, backSkippedTime: float) -> None:
         self.setSubDataByPoints(int(frontSkippedTime * self.getFPS()), int(backSkippedTime * self.getFPS()))
