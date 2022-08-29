@@ -1,95 +1,86 @@
-#!/usr/bin/python
-# coding: UTF-8
-#
-# Author:   Dawid Laszuk
-# Contact:  https://github.com/laszukdawid/PyEMD/issues
-#
-# Feel free to contact for any information.
-
-import logging
 from typing import Optional, Tuple
-
 import numpy as np
-from scipy.interpolate import interp1d
-
-from LetEMD.splines import akima, cubic_spline_3pts
-from LetEMD.utils import get_timeline
+from scipy.interpolate import interp1d, Akima1DInterpolator
 
 FindExtremaOutput = Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]
 
 
+def cubic_spline_3pts(x, y, T):
+    """
+    Apparently scipy.interpolate.interp1d does not support
+    cubic spline for less than 4 points.
+    """
+    x0, x1, x2 = x
+    y0, y1, y2 = y
+
+    x1x0, x2x1 = x1 - x0, x2 - x1
+    y1y0, y2y1 = y1 - y0, y2 - y1
+    _x1x0, _x2x1 = 1.0 / x1x0, 1.0 / x2x1
+
+    m11, m12, m13 = 2 * _x1x0, _x1x0, 0
+    m21, m22, m23 = _x1x0, 2.0 * (_x1x0 + _x2x1), _x2x1
+    m31, m32, m33 = 0, _x2x1, 2.0 * _x2x1
+
+    v1 = 3 * y1y0 * _x1x0 * _x1x0
+    v3 = 3 * y2y1 * _x2x1 * _x2x1
+    v2 = v1 + v3
+
+    M = np.array([[m11, m12, m13], [m21, m22, m23], [m31, m32, m33]])
+    v = np.array([v1, v2, v3]).T
+    k = np.array(np.linalg.inv(M).dot(v))
+
+    a1 = k[0] * x1x0 - y1y0
+    b1 = -k[1] * x1x0 + y1y0
+    a2 = k[1] * x2x1 - y2y1
+    b2 = -k[2] * x2x1 + y2y1
+
+    t = T[np.r_[T >= x0] & np.r_[T <= x2]]
+    t1 = (T[np.r_[T >= x0] & np.r_[T < x1]] - x0) / x1x0
+    t2 = (T[np.r_[T >= x1] & np.r_[T <= x2]] - x1) / x2x1
+    t11, t22 = 1.0 - t1, 1.0 - t2
+
+    q1 = t11 * y0 + t1 * y1 + t1 * t11 * (a1 * t11 + b1 * t1)
+    q2 = t22 * y1 + t2 * y2 + t2 * t22 * (a2 * t22 + b2 * t2)
+    q = np.append(q1, q2)
+
+    return t, q
+
+
+def smallest_inclusive_dtype(ref_dtype: np.dtype, ref_value) -> np.dtype:
+    if np.issubdtype(ref_dtype, np.integer):
+        for dtype in [np.uint16, np.uint32, np.uint64]:
+            if ref_value < np.iinfo(dtype).max:
+                return dtype
+        max_val = np.iinfo(np.uint32).max
+        raise ValueError("Requested too large integer range. Exceeds max( uint64 ) == '{}.".format(max_val))
+
+    # Integer path
+    if np.issubdtype(ref_dtype, np.floating):
+        for dtype in [np.float16, np.float32, np.float64]:
+            if ref_value < np.finfo(dtype).max:
+                return dtype
+        max_val = np.finfo(np.float64).max
+        raise ValueError("Requested too large integer range. Exceeds max( float64 ) == '{}.".format(max_val))
+
+    raise ValueError("Unsupported dtype '{}'. Only intX and floatX are supported.".format(ref_dtype))
+
+
+def get_timeline(range_max: int, dtype: Optional[np.dtype] = None) -> np.ndarray:
+
+    timeline = np.arange(0, range_max, dtype=dtype)
+    if timeline[-1] != range_max - 1:
+        inclusive_dtype = smallest_inclusive_dtype(timeline.dtype, range_max)
+        timeline = np.arange(0, range_max, dtype=inclusive_dtype)
+    return timeline
+
+
+def akima(X, Y, x):
+    spl = Akima1DInterpolator(X, Y)
+    return spl(x)
+
 class EMD:
-    """
-    .. _EMD:
-
-    **Empirical Mode Decomposition**
-
-    Method of decomposing signal into Intrinsic Mode Functions (IMFs)
-    based on algorithm presented in Huang et al. [Huang1998]_.
-
-    Algorithm was validated with Rilling et al. [Rilling2003]_ Matlab's version from 3.2007.
-
-    Threshold which control the goodness of the decomposition:
-        * `std_thr` --- Test for the proto-IMF how variance changes between siftings.
-        * `svar_thr` -- Test for the proto-IMF how energy changes between siftings.
-        * `total_power_thr` --- Test for the whole decomp how much of energy is solved.
-        * `range_thr` --- Test for the whole decomp whether the difference is tiny.
-
-
-    References
-    ----------
-    .. [Huang1998] N. E. Huang et al., "The empirical mode decomposition and the
-        Hilbert spectrum for non-linear and non stationary time series
-        analysis", Proc. Royal Soc. London A, Vol. 454, pp. 903-995, 1998
-    .. [Rilling2003] G. Rilling, P. Flandrin and P. Goncalves, "On Empirical Mode
-        Decomposition and its algorithms", IEEE-EURASIP Workshop on
-        Nonlinear Signal and Image Processing NSIP-03, Grado (I), June 2003
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> T = np.linspace(0, 1, 100)
-    >>> S = np.sin(2*2*np.pi*T)
-    >>> emd = EMD(extrema_detection='parabol')
-    >>> IMFs = emd.emd(S)
-    >>> IMFs.shape
-    (1, 100)
-    """
-
-    logger = logging.getLogger(__name__)
 
     def __init__(self, spline_kind: str = "cubic", nbsym: int = 2, **kwargs):
-        """Initiate *EMD* instance.
-
-        Configuration, such as threshold values, can be passed as kwargs (keyword arguments).
-
-        Parameters
-        ----------
-        FIXE : int (default: 0)
-        FIXE_H : int (default: 0)
-        MAX_ITERATION : int (default 1000)
-            Maximum number of iterations per single sifting in EMD.
-        energy_ratio_thr : float (default: 0.2)
-            Threshold value on energy ratio per IMF check.
-        std_thr float : (default 0.2)
-            Threshold value on standard deviation per IMF check.
-        svar_thr float : (default 0.001)
-            Threshold value on scaled variance per IMF check.
-        total_power_thr : float (default 0.005)
-            Threshold value on total power per EMD decomposition.
-        range_thr : float (default 0.001)
-            Threshold for amplitude range (after scaling) per EMD decomposition.
-        extrema_detection : str (default 'simple')
-            Method used to finding extrema.
-        DTYPE : np.dtype (default np.float64)
-            Data type used.
-
-        Examples
-        --------
-        >>> emd = EMD(std_thr=0.01, range_thr=0.05)
-
-        """
-        # Declare constants
         self.energy_ratio_thr = float(kwargs.get("energy_ratio_thr", 0.2))
         self.std_thr = float(kwargs.get("std_thr", 0.2))
         self.svar_thr = float(kwargs.get("svar_thr", 0.001))
@@ -122,39 +113,13 @@ class EMD:
     def extract_max_min_spline(
         self, T: np.ndarray, S: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Extracts top and bottom envelopes based on the signal,
-        which are constructed based on maxima and minima, respectively.
-
-        Parameters
-        ----------
-        T : numpy array
-            Position or time array.
-        S : numpy array
-            Input data S(T).
-
-        Returns
-        -------
-        max_spline : numpy array
-            Spline spanned on S maxima.
-        min_spline : numpy array
-            Spline spanned on S minima.
-        max_extrema : numpy array
-            Points indicating local maxima.
-        min_extrema : numpy array
-            Points indicating local minima.
-        """
-
-        # Get indexes of extrema
+        
         ext_res = self.find_extrema(T, S)
         max_pos, max_val = ext_res[0], ext_res[1]
         min_pos, min_val = ext_res[2], ext_res[3]
 
         if len(max_pos) + len(min_pos) < 3:
-            return [-1] * 4  # TODO: Fix this. Doesn't match the signature.
-
-        #########################################
-        # Extrapolation of signal (over boundaries)
+            return [-1] * 4
         max_extrema, min_extrema = self.prepare_points(T, S, max_pos, max_val, min_pos, min_val)
 
         _, max_spline = self.spline_points(T, max_extrema)
@@ -171,33 +136,6 @@ class EMD:
         min_pos: np.ndarray,
         min_val: np.ndarray,
     ):
-        """
-        Performs extrapolation on edges by adding extra extrema, also known
-        as mirroring signal. The number of added points depends on *nbsym*
-        variable.
-
-        Parameters
-        ----------
-        T : numpy array
-            Position or time array.
-        S : numpy array
-            Input signal.
-        max_pos : iterable
-            Sorted time positions of maxima.
-        max_val : iterable
-            Signal values at max_pos positions.
-        min_pos : iterable
-            Sorted time positions of minima.
-        min_val : iterable
-            Signal values at min_pos positions.
-
-        Returns
-        -------
-        max_extrema : numpy array (2 rows)
-            Position (1st row) and values (2nd row) of minima.
-        min_extrema : numpy array (2 rows)
-            Position (1st row) and values (2nd row) of maxima.
-        """
         if self.extrema_detection == "parabol":
             return self._prepare_points_parabol(T, S, max_pos, max_val, min_pos, min_val)
         elif self.extrema_detection == "simple":
@@ -705,11 +643,9 @@ class EMD:
         tmp = S - np.sum(IMF, axis=0)
 
         if np.max(tmp) - np.min(tmp) < self.range_thr:
-            self.logger.debug("FINISHED -- RANGE")
             return True
 
         if np.sum(np.abs(tmp)) < self.total_power_thr:
-            self.logger.debug("FINISHED -- SUM POWER")
             return True
 
         return False
@@ -741,18 +677,15 @@ class EMD:
         # Scaled variance test
         svar = imf_diff_sqrd_sum / (max(imf_old) - min(imf_old))
         if svar < self.svar_thr:
-            self.logger.debug("Scaled variance -- PASSED")
             return True
 
         # Standard deviation test
         std = np.sum((imf_diff / imf_new) ** 2)
         if std < self.std_thr:
-            self.logger.debug("Standard deviation -- PASSED")
             return True
 
         energy_ratio = imf_diff_sqrd_sum / np.sum(imf_old * imf_old)
         if energy_ratio < self.energy_ratio_thr:
-            self.logger.debug("Energy ratio -- PASSED")
             return True
 
         return False
@@ -778,27 +711,6 @@ class EMD:
         return (t - t[0]) / np.min(d)
 
     def emd(self, S: np.ndarray, T: Optional[np.ndarray] = None, max_imf: int = -1) -> np.ndarray:
-        """
-        Performs Empirical Mode Decomposition on signal S.
-        The decomposition is limited to *max_imf* imfs.
-        Returns IMF functions in numpy array format.
-
-        Parameters
-        ----------
-        S : numpy array,
-            Input signal.
-        T : numpy array, (default: None)
-            Position or time array. If None is passed or self.extrema_detection == "simple",
-            then numpy range is created.
-        max_imf : int, (default: -1)
-            IMF number to which decomposition should be performed.
-            Negative value means *all*.
-
-        Returns
-        -------
-        IMF : numpy array
-            Set of IMFs produced from input signal.
-        """
         if T is not None and len(S) != len(T):
             raise ValueError("Time series have different sizes: len(S) -> {} != {} <- len(T)".format(len(S), len(T)))
 
@@ -827,7 +739,6 @@ class EMD:
         finished = False
 
         while not finished:
-            self.logger.debug("IMF -- %s", imfNo)
 
             residue[:] = S - np.sum(IMF[:imfNo], axis=0)
             imf = residue.copy()
@@ -840,7 +751,6 @@ class EMD:
             while True:
                 n += 1
                 if n >= self.MAX_ITERATION:
-                    self.logger.info("Max iterations reached for IMF. Continuing with another IMF.")
                     break
 
                 ext_res = self.find_extrema(T, imf)
@@ -927,36 +837,11 @@ class EMD:
         return IMF
 
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Provides access to separated imfs and residue from recently analysed signal.
-
-        Returns
-        -------
-        imfs : np.ndarray
-            Obtained IMFs
-        residue : np.ndarray
-            Residue.
-
-        """
         if self.imfs is None or self.residue is None:
             raise ValueError("No IMF found. Please, run EMD method or its variant first.")
         return self.imfs, self.residue
 
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Provides access to separated imfs and trend from recently analysed signal.
-        Note that this may differ from the `get_imfs_and_residue` as the trend isn't
-        necessarily the residue. Residue is a point-wise difference between input signal
-        and all obtained components, whereas trend is the slowest component (can be zero).
-
-        Returns
-        -------
-        imfs : np.ndarray
-            Obtained IMFs
-        trend : np.ndarray
-            The main trend.
-
-        """
         if self.imfs is None or self.residue is None:
             raise ValueError("No IMF found. Please, run EMD method or its variant first.")
 
@@ -965,55 +850,3 @@ class EMD:
             return imfs[:-1].copy(), imfs[-1].copy()
         else:
             return imfs, residue
-
-
-###################################################
-
-
-if __name__ == "__main__":
-    import pylab as plt
-
-    # Logging options
-    logging.basicConfig(level=logging.DEBUG)
-
-    # EMD options
-    max_imf = -1
-    DTYPE = np.float64
-
-    # Signal options
-    N = 400
-    tMin, tMax = 0, 2 * np.pi
-    T = np.linspace(tMin, tMax, N, dtype=DTYPE)
-
-    S = np.sin(20 * T * (1 + 0.2 * T)) + T ** 2 + np.sin(13 * T)
-    S = S.astype(DTYPE)
-    print("Input S.dtype: " + str(S.dtype))
-
-    # Prepare and run EMD
-    emd = EMD()
-    emd.FIXE_H = 5
-    emd.nbsym = 2
-    emd.spline_kind = "cubic"
-    emd.DTYPE = DTYPE
-
-    imfs = emd.emd(S, T, max_imf)
-    imfNo = imfs.shape[0]
-
-    # Plot results
-    c = 1
-    r = np.ceil((imfNo + 1) / c)
-
-    plt.ioff()
-    plt.subplot(r, c, 1)
-    plt.plot(T, S, "r")
-    plt.xlim((tMin, tMax))
-    plt.title("Original signal")
-
-    for num in range(imfNo):
-        plt.subplot(r, c, num + 2)
-        plt.plot(T, imfs[num], "g")
-        plt.xlim((tMin, tMax))
-        plt.ylabel("Imf " + str(num + 1))
-
-    plt.tight_layout()
-    plt.show()
