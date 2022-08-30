@@ -21,7 +21,7 @@ def data2IMFs(data: Data):
     # In case of EMD
     emd = EMD()
     emd.emd(data.getData())
-    imfs, res = emd.get_imfs_and_residue()
+    imfs, res = emd.getIMFsAndResidue()
 
     # In general:
     #components = EEMD()(S)

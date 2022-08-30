@@ -106,6 +106,7 @@ x轴：频率，y轴：时间，z轴：振幅
 
 + ```Codes/main.py```：主程序，主要负责调用
 + ```Codes/BaseClass.py```：数据类，包括数据、起始截止时间、采样频率等
++ ```Codes/BaseFunction.py```：一些基本的函数功能
 + ```Codes/Visualize.py```：将数据可视化
 + ```Codes/Txt2numpy.py```：读取数据
 + ```Codes/ShowOriginalEEGdata.py```：显示原始EEG
