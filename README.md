@@ -4,6 +4,7 @@ Paper reproduction: Instantaneous 3D EEG Signal Analysis Based on Empirical Mode
 
 + Project URL: [http://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/](http://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/)
 + Online Address: [https://i3deegsa.letmefly.xyz/](https://i3deegsa.letmefly.xyz/)
++ Release: [i3deegsa-v0.0.1-Py3.8.8-x32.exe](https://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/releases/download/v0.1.0/i3deegsa-v0.0.1-Py3.8.8-x32.exe) （仅支持读取相同目录下的[case7.txt](https://github.com/LetMeFly666/Instantaneous3D_EEG_SignalAnalysis/releases/download/v0.1.0/case7.txt)）
 
 ## 名词
 
