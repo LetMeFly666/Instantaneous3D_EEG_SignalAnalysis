@@ -17,6 +17,9 @@ class EMD():
         self.MAX_ITERATION = 1000
         self.imfs = None
         self.residue = None
+    
+    def __call__(self, S):
+        return self.emd(S, T=None, max_imf=-1)
 
     def emd(self, S: np.ndarray, T = None, max_imf: int = -1) -> np.ndarray:
         T = np.arange(0, len(S), dtype=S.dtype)
@@ -24,49 +27,37 @@ class EMD():
         S, T = BaseFunction.ChangeToSameType(S, T)
         self.DTYPE = S.dtype
         N = len(S)
-
         residue = S.astype(self.DTYPE)
         imf = np.zeros(len(S), dtype=self.DTYPE)
         imf_old = np.nan
-
         imfNo = 0
         extNo = -1
         IMF = np.empty((imfNo, N))
         finished = False
 
         while not finished:
-
             residue[:] = S - np.sum(IMF[:imfNo], axis=0)
             imf = residue.copy()
             mean = np.zeros(len(S), dtype=self.DTYPE)
-
-            # Counters
             n = 0  # All iterations for current imf.
             n_h = 0  # counts when |#zero - #ext| <=1
-
             while True:
                 n += 1
                 if n >= self.MAX_ITERATION:
                     break
-
                 ext_res = BaseFunction.peekDetection(T, imf)
                 max_pos, min_pos, indzer = ext_res[0], ext_res[2], ext_res[4]
                 extNo = len(min_pos) + len(max_pos)
                 nzm = len(indzer)
-
                 if extNo > 2:
-
                     max_env, min_env, eMax, eMin = self.extract_max_min_spline(T, imf)
                     mean[:] = 0.5 * (max_env + min_env)
-
                     imf_old = imf.copy()
                     imf[:] = imf - mean
-
                     # Fix number of iterations
                     if self.FIXE:
                         if n >= self.FIXE:
                             break
-
                     # Fix number of iterations after number of zero-crossings
                     # and extrema differ at most by one.
                     elif self.FIXE_H:
@@ -74,30 +65,22 @@ class EMD():
                         max_pos, min_pos, ind_zer = (tmp_residue[0], tmp_residue[2], tmp_residue[4])
                         extNo = len(max_pos) + len(min_pos)
                         nzm = len(ind_zer)
-
                         if n == 1:
                             continue
-
                         n_h = n_h + 1 if abs(extNo - nzm) < 2 else 0
-
                         if n_h >= self.FIXE_H:
                             break
-
                     else:
                         ext_res = BaseFunction.peekDetection(T, imf)
                         max_pos, _, min_pos, _, ind_zer = ext_res
                         extNo = len(max_pos) + len(min_pos)
                         nzm = len(ind_zer)
-
                         if imf_old is np.nan:
                             continue
-
                         f1 = self.check_imf(imf, imf_old, eMax, eMin)
                         f2 = abs(extNo - nzm) < 2
-
                         if f1 and f2:
                             break
-
                 else:
                     finished = True
                     break
@@ -119,10 +102,6 @@ class EMD():
             IMF = np.vstack((IMF, self.residue))
 
         return IMF
-
-
-    def __call__(self, S):
-        return self.emd(S, T=None, max_imf=-1)
 
     def extract_max_min_spline(self, T: np.ndarray, S: np.ndarray):
         
