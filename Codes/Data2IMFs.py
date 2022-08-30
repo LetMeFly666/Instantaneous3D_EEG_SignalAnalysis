@@ -2,10 +2,9 @@
 Author: LetMeFly
 Date: 2022-08-24 20:49:20
 LastEditors: LetMeFly
-LastEditTime: 2022-08-29 21:19:10
+LastEditTime: 2022-08-30 21:12:07
 '''
-import numpy as np
-from LetEMD import EMD  # , Visualisation
+from LetEMD import EMD
 from matplotlib import pyplot as plt
 from BaseClass import Data
 
@@ -20,22 +19,22 @@ def data2IMFs(data: Data):
     # Extract imfs and residue
     # In case of EMD
     emd = EMD()
-    emd.emd(data.getData())
-    imfs, res = emd.getIMFsAndResidue()
+    IMFs, residue = emd.emd(data.getData())
+    # imfs, res = emd.getIMFsAndResidue()
 
     # In general:
     #components = EEMD()(S)
     #imfs, res = components[:-1], components[-1]
 
-    fig, axes = plt.subplots(imfs.shape[0] + 1, 1)
-    if imfs.shape[0] == 1:
+    fig, axes = plt.subplots(IMFs.shape[0] + 1, 1)
+    if IMFs.shape[0] == 1:
         axes = list(axes)
     axes[0].set_title("The IMFs")
-    for num, IMF in enumerate(imfs):
+    for num, IMF in enumerate(IMFs):
         axes[num].plot(data.getTimeRangeArray(), IMF)
         axes[num].set_ylabel("IMF " + str(num + 1))
-    axes[imfs.shape[0]].plot(data.getTimeRangeArray(), res)
-    axes[imfs.shape[0]].set_ylabel("Residue")
+    axes[IMFs.shape[0]].plot(data.getTimeRangeArray(), residue)
+    axes[IMFs.shape[0]].set_ylabel("Residue")
 
     plt.show()
 
@@ -44,5 +43,5 @@ def data2IMFs(data: Data):
     # vis.plot_instant_freq(t, imfs=imfs)
     # vis.show()
 
-    return Data(imfs, data.getStartTime(), data.getFPS())
+    return Data(IMFs, data.getStartTime(), data.getFPS())
 

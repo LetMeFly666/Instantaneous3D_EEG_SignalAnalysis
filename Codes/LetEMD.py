@@ -11,14 +11,8 @@ class EMD():
         self.dtype = np.float64
         self.IMFs = None
         self.residue = None
-    
-    def __call__(self, S):
-        return self.emd(S, T=None, max_imf=-1)
-    
-    def getIMFsAndResidue(self):
-        return self.IMFs, self.residue
 
-    def emd(self, S, T=None, max_imf: int=-1):
+    def emd(self, S, T=None, max_imf=-1):
         T = np.arange(0, len(S), dtype=S.dtype)
         T = BaseFunction.formatTimeArray(T)
         S, T = BaseFunction.ChangeToSameType(S, T)
@@ -67,23 +61,17 @@ class EMD():
             if self.timeToStop(S, IMF2) or IMFNum == max_imf:
                 done = True
                 break
-        if EXTNum <= 2:
-            IMF2 = IMF2[:-1]
         self.IMFs = IMF2.copy()
         self.residue = S - np.sum(self.IMFs, axis=0)
-        if not np.allclose(self.residue, 0):
-            IMF2 = np.vstack((IMF2, self.residue))
-        return IMF2
+        return self.IMFs, self.residue
 
     def extractMaxAndMinSpline(self, T: np.ndarray, S: np.ndarray):
-        
         extremaLoc = BaseFunction.peekDetection(T, S)
         maxLoc, maxVal = extremaLoc[0], extremaLoc[1]
         minLoc, minVal = extremaLoc[2], extremaLoc[3]
         if len(maxLoc) + len(minLoc) < 3:
             return [-1] * 4
         maxExtrema, minExtrema = self.preparePoints(T, S, maxLoc, maxVal, minLoc, minVal)
-
         temp, maxSpline = self.cubicSpline(T, maxExtrema)
         temp, minSpline = self.cubicSpline(T, minExtrema)
         return maxSpline, minSpline, maxExtrema, minExtrema
@@ -136,7 +124,6 @@ class EMD():
             expandLeftMinPos, expandLeftMinVal = minLoc, minVal
         if not expandLeftMaxPos.shape:
             expandLeftMaxPos, expandLeftMaxVal = maxLoc, maxVal
-
         expandLeftMin = np.vstack((expandLeftMinPos[::-1], expandLeftMinVal[::-1]))
         expandLeftMax = np.vstack((expandLeftMaxPos[::-1], expandLeftMaxVal[::-1]))
 
@@ -185,12 +172,10 @@ class EMD():
         if not expandRightMaxLoc.shape:
             expandRightMaxLoc, expandRightMaxVal = maxLoc, maxVal
 
-        expand_right_min = np.vstack((expandRightMinPos[::-1], expandRightMinVal[::-1]))
-        expand_right_max = np.vstack((expandRightMaxLoc[::-1], expandRightMaxVal[::-1]))
-
-        maxExtrema = np.hstack((expandLeftMax, maxExtrema, expand_right_max))
-        minExtrema = np.hstack((expandLeftMin, minExtrema, expand_right_min))
-
+        enpandRightMin = np.vstack((expandRightMinPos[::-1], expandRightMinVal[::-1]))
+        expandRightMax = np.vstack((expandRightMaxLoc[::-1], expandRightMaxVal[::-1]))
+        maxExtrema = np.hstack((expandLeftMax, maxExtrema, expandRightMax))
+        minExtrema = np.hstack((expandLeftMin, minExtrema, enpandRightMin))
         return maxExtrema, minExtrema
 
     """
