@@ -101,10 +101,10 @@ class EMD():
         minEnd, maxEnd = len(minLoc), len(maxLoc)
         # 左边界
         locD = maxLoc[0] - minLoc[0]
-        leftExtremaMaxType = locD < 0  # 如果locD < 0，那么leftExtremaMaxType就为True，就说明为左极值最大值；否则为最小值
+        ifLeftExtremaIsMax = locD < 0  # 如果locD < 0，那么leftExtremaMaxType就为True，就说明为左极值最大值；否则为最小值
 
         # 左极值为最大值
-        if leftExtremaMaxType:
+        if ifLeftExtremaIsMax:
             if (S[0] > minVal[0]) and (np.abs(locD) > (maxLoc[0] - T[0])):
                 # 第一个极值
                 expandLeftMaxPos = 2 * maxLoc[0] - maxLoc[1 : nbsym + 1]
@@ -126,7 +126,7 @@ class EMD():
                 expandLeftMaxVal = maxVal[0:nbsym]
                 expandLeftMinVal = minVal[1 : nbsym + 1]
             else:
-                # mirror signal to beginning
+                # 起始位置
                 expandLeftMaxPos = 2 * T[0] - np.append(T[0], maxLoc[0 : nbsym - 1])
                 expandLeftMinPos = 2 * T[0] - minLoc[0:nbsym]
                 expandLeftMaxVal = np.append(S[0], maxVal[0 : nbsym - 1])
@@ -137,61 +137,59 @@ class EMD():
         if not expandLeftMaxPos.shape:
             expandLeftMaxPos, expandLeftMaxVal = maxLoc, maxVal
 
-        expand_left_min = np.vstack((expandLeftMinPos[::-1], expandLeftMinVal[::-1]))
-        expand_left_max = np.vstack((expandLeftMaxPos[::-1], expandLeftMaxVal[::-1]))
+        expandLeftMin = np.vstack((expandLeftMinPos[::-1], expandLeftMinVal[::-1]))
+        expandLeftMax = np.vstack((expandLeftMaxPos[::-1], expandLeftMaxVal[::-1]))
 
-        # Right bound
+        # 右边界
         locD = maxLoc[-1] - minLoc[-1]
-        right_ext_max_type = locD > 0
-
-        # Right extremum is maximum
-        if not right_ext_max_type:
+        rightExtremaMaxYype = locD > 0
+        # 右极值是最大值
+        if not rightExtremaMaxYype:
             if (S[-1] < maxVal[-1]) and (np.abs(locD) > (T[-1] - minLoc[-1])):
-                # mirror signal to last extrema
-                idx_max = max(0, maxEnd - nbsym)
-                idx_min = max(0, minEnd - nbsym - 1)
-                expand_right_max_pos = 2 * minLoc[-1] - maxLoc[idx_max:]
-                expand_right_min_pos = 2 * minLoc[-1] - minLoc[idx_min:-1]
-                expand_right_max_val = maxVal[idx_max:]
-                expand_right_min_val = minVal[idx_min:-1]
+                # 最后一个极值
+                maxIndex = max(0, maxEnd - nbsym)
+                minIndex = max(0, minEnd - nbsym - 1)
+                expandRightMaxLoc = 2 * minLoc[-1] - maxLoc[maxIndex:]
+                expandRightMinPos = 2 * minLoc[-1] - minLoc[minIndex:-1]
+                expandRightMaxVal = maxVal[maxIndex:]
+                expandRightMinVal = minVal[minIndex:-1]
             else:
-                # mirror signal to end
-                idx_max = max(0, maxEnd - nbsym + 1)
-                idx_min = max(0, minEnd - nbsym)
-                expand_right_max_pos = 2 * T[-1] - np.append(maxLoc[idx_max:], T[-1])
-                expand_right_min_pos = 2 * T[-1] - minLoc[idx_min:]
-                expand_right_max_val = np.append(maxVal[idx_max:], S[-1])
-                expand_right_min_val = minVal[idx_min:]
-
-        # Right extremum is minimum
+                # 终止位置
+                maxIndex = max(0, maxEnd - nbsym + 1)
+                minIndex = max(0, minEnd - nbsym)
+                expandRightMaxLoc = 2 * T[-1] - np.append(maxLoc[maxIndex:], T[-1])
+                expandRightMinPos = 2 * T[-1] - minLoc[minIndex:]
+                expandRightMaxVal = np.append(maxVal[maxIndex:], S[-1])
+                expandRightMinVal = minVal[minIndex:]
+        # 右极值是最小值
         else:
             if (S[-1] > minVal[-1]) and len(maxLoc) > 1 and (np.abs(locD) > (T[-1] - maxLoc[-1])):
-                # mirror signal to last extremum
-                idx_max = max(0, maxEnd - nbsym - 1)
-                idx_min = max(0, minEnd - nbsym)
-                expand_right_max_pos = 2 * maxLoc[-1] - maxLoc[idx_max:-1]
-                expand_right_min_pos = 2 * maxLoc[-1] - minLoc[idx_min:]
-                expand_right_max_val = maxVal[idx_max:-1]
-                expand_right_min_val = minVal[idx_min:]
+                # 最后一个极值
+                maxIndex = max(0, maxEnd - nbsym - 1)
+                minIndex = max(0, minEnd - nbsym)
+                expandRightMaxLoc = 2 * maxLoc[-1] - maxLoc[maxIndex:-1]
+                expandRightMinPos = 2 * maxLoc[-1] - minLoc[minIndex:]
+                expandRightMaxVal = maxVal[maxIndex:-1]
+                expandRightMinVal = minVal[minIndex:]
             else:
-                # mirror signal to end
-                idx_max = max(0, maxEnd - nbsym)
-                idx_min = max(0, minEnd - nbsym + 1)
-                expand_right_max_pos = 2 * T[-1] - maxLoc[idx_max:]
-                expand_right_min_pos = 2 * T[-1] - np.append(minLoc[idx_min:], T[-1])
-                expand_right_max_val = maxVal[idx_max:]
-                expand_right_min_val = np.append(minVal[idx_min:], S[-1])
+                # 终止位置
+                maxIndex = max(0, maxEnd - nbsym)
+                minIndex = max(0, minEnd - nbsym + 1)
+                expandRightMaxLoc = 2 * T[-1] - maxLoc[maxIndex:]
+                expandRightMinPos = 2 * T[-1] - np.append(minLoc[minIndex:], T[-1])
+                expandRightMaxVal = maxVal[maxIndex:]
+                expandRightMinVal = np.append(minVal[minIndex:], S[-1])
 
-        if not expand_right_min_pos.shape:
-            expand_right_min_pos, expand_right_min_val = minLoc, minVal
-        if not expand_right_max_pos.shape:
-            expand_right_max_pos, expand_right_max_val = maxLoc, maxVal
+        if not expandRightMinPos.shape:
+            expandRightMinPos, expandRightMinVal = minLoc, minVal
+        if not expandRightMaxLoc.shape:
+            expandRightMaxLoc, expandRightMaxVal = maxLoc, maxVal
 
-        expand_right_min = np.vstack((expand_right_min_pos[::-1], expand_right_min_val[::-1]))
-        expand_right_max = np.vstack((expand_right_max_pos[::-1], expand_right_max_val[::-1]))
+        expand_right_min = np.vstack((expandRightMinPos[::-1], expandRightMinVal[::-1]))
+        expand_right_max = np.vstack((expandRightMaxLoc[::-1], expandRightMaxVal[::-1]))
 
-        maxExtrema = np.hstack((expand_left_max, maxExtrema, expand_right_max))
-        minExtrema = np.hstack((expand_left_min, minExtrema, expand_right_min))
+        maxExtrema = np.hstack((expandLeftMax, maxExtrema, expand_right_max))
+        minExtrema = np.hstack((expandLeftMin, minExtrema, expand_right_min))
 
         return maxExtrema, minExtrema
 
