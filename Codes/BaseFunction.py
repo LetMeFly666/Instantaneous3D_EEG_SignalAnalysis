@@ -2,7 +2,7 @@
 Author: LetMeFly
 Date: 2022-08-30 09:44:58
 LastEditors: LetMeFly
-LastEditTime: 2022-08-30 20:28:46
+LastEditTime: 2022-08-30 20:44:31
 '''
 import numpy as np
 
@@ -25,7 +25,7 @@ def formatTimeArray(t):
 scipy.interpolate.interp1d不支持少于4个点的三次样条曲线
 https://blog.csdn.net/bodybo/article/details/77335129
 """
-def cubic_spline_3pts(x, y, T):
+def MyCubicSpline(x, y, T):
     
     x0, x1, x2 = x
     y0, y1, y2 = y
