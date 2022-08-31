@@ -1,0 +1,403 @@
+\documentclass[cs4size,a4paper]{ctexart}   
+%===数学符号公式===
+\usepackage{amsmath}    					% AMS LaTeX宏包
+\usepackage[style=1]{mdframed}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{bm}                      	% 数学公式中的黑斜体
+\usepackage{bbm}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}                	% 英文花体字 体
+\usepackage{bbding,manfnt}    			% 一些图标，如 \dbend
+\usepackage{lettrine}                	% 首字下沉，命令\lettrine
+\def\attention{\lettrine[lines=2,lraise=0,nindent=0em]{\large\textdbend\hspace{1mm}}{}}
+\usepackage{longtable}
+\usepackage{enumerate}
+\usepackage[toc,page]{appendix}
+\usepackage{geometry}         			% 页边距调整
+\geometry{top=3.0cm,bottom=2.7cm,left=2.5cm,right=2.5cm}
+\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+%===公式按章编号===
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+%===基本格式预置===
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}  
+\fancyhead[C]{\zihao{5}  \kaishu LaTeX软件使用指导}
+\fancyfoot[C]{~\zihao{5} \thepage~}
+\renewcommand{\headrulewidth}{0.75pt} 
+\CTEXsetup[format={\centering\bfseries\zihao{-2}},name={第, 章}]{section}
+\CTEXsetup[nameformat={\bfseries\zihao{3}}]{subsection}
+\CTEXsetup[nameformat={\bfseries\zihao{4}}]{subsubsection}
+%===图形支持宏包===
+\usepackage{graphicx}        			% 嵌入png图像
+\usepackage{subfigure}
+\usepackage{float}
+\graphicspath{{figure/}}
+\usepackage{color,xcolor}     			% 支持彩色文本、底色、文本框等
+\usepackage[colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue]{hyperref}
+%\usepackage{caption}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+%\captionsetup{figurewithin=section}
+%===源码和流程图===
+\usepackage{listings,fontspec}         	% 粘贴源代码
+\newfontfamily\monaco{Monaco}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+backgroundcolor=\color{white},   		% choose the background color
+basicstyle=\footnotesize\monaco,       % size of fonts used for the code
+columns=fullflexible,
+breaklines=true,                 		% automatic line breaking only at whitespace
+captionpos=b,                    		% sets the caption-position to bottom
+tabsize=4,
+commentstyle=\color{mygreen}\monaco,   % comment style
+escapeinside={\%*}{*)},          		% if you want to add LaTeX within your code
+keywordstyle=\color{blue}\monaco,      % keyword style
+stringstyle=\color{mymauve}\monaco,    % string literal style
+frame=single,
+rulesepcolor=\color{red!20!green!20!blue!20},
+% identifierstyle=\color{red},
+language=python,
+}
+%===颜色===
+\usepackage{color,xcolor}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ \usepackage{xcolor}
+ \lstset{
+  %行号
+   numbers=left,
+   %背景框
+   framexleftmargin=8mm,
+   frame=none,
+   %背景色
+   %backgroundcolor=\color[rgb]{1,1,0.76},
+   backgroundcolor=\color[RGB]{245,245,244},
+   %样式
+   keywordstyle=\bf\color{blue},
+   identifierstyle=\bf,
+   numberstyle=\color[RGB]{0,192,192},
+   commentstyle=\it\color[RGB]{0,96,96},
+   stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+   %显示空格
+   showstringspaces=false,
+   xleftmargin=2.5em
+ }
+
+%--------------------
+\hypersetup{hidelinks}
+\usepackage{booktabs}  
+\usepackage{shorttoc}
+\usepackage{tabu,tikz}
+\usepackage{float}
+\usepackage{multirow}
+
+\tabcolsep=1ex
+\tabulinesep=\tabcolsep
+\newlength\tikzboxwidth
+\newlength\tikzboxheight
+\newcommand\tikzbox[1]{%
+        \settowidth\tikzboxwidth{#1}%
+        \settoheight\tikzboxheight{#1}%
+        \begin{tikzpicture}
+        \path[use as bounding box]
+                (-0.5\tikzboxwidth,-0.5\tikzboxheight)rectangle
+                (0.5\tikzboxwidth,0.5\tikzboxheight);
+        \node[inner sep=\tabcolsep+0.5\arrayrulewidth,line width=0.5mm,draw=black]
+                at(0,0){#1};
+        \end{tikzpicture}%
+        }
+\makeatletter
+\def\hlinew#1{%
+  \noalign{\ifnum0=`}\fi\hrule \@height #1 \futurelet
+   \reserved@a\@xhline}
+   
+
+\usepackage{ifthen}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}%
+%===使得公式随章节自动编号===
+\makeatletter
+\@addtoreset{equation}{section}
+\makeatother
+\renewcommand{\theequation}{\arabic{section}.\arabic{equation}}
+%-------------------------
+\usepackage{pythonhighlight}
+\usepackage{tikz}                    
+\usepackage{tikz-3dplot}
+% \usepackage{hyperref}
+\usetikzlibrary{shapes,arrows,positioning}
+%===正文开始===
+\begin{document}
+%===定理类环境定义===
+\newtheorem{example}{例}              	% 整体编号
+\newtheorem{algorithem}{算法}	
+\newtheorem{theorem}{定理}            	% 按section编号
+\newtheorem{definition}{定义}
+\newtheorem{axiom}{公理}
+\newtheorem{property}{性质}
+\newtheorem{proposition}{命题}
+\newtheorem{lemma}{引理}
+\newtheorem{corollary}{推论}
+\newtheorem{remark}{注解}
+\newtheorem{condition}{条件}
+\newtheorem{conclusion}{结论}
+\newtheorem{assumption}{假设}
+%===重定义===
+\renewcommand{\contentsname}{目录}     
+\renewcommand{\abstractname}{摘要} 
+\renewcommand{\refname}{参考文献}     
+\renewcommand{\indexname}{索引}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\appendixname}{附录}
+\renewcommand{\proofname}{证明}
+%\renewcommand{\algorithm}{算法} 
+\renewcommand\emph[1]{\textcolor{red}{\textbf{#1}}}
+%===封皮和前言===
+\begin{titlepage}
+\begin{center}
+% Upper part of the page
+\includegraphics[width=0.25\textwidth]{logo}\\[1cm]    
+%\textsf{\LARGE\bfseries Natural selection, Survival of the fittest.}\\[1.0cm]
+\textsf{\Large\bfseries Beijing University of Chemical Technology}\\[1.0cm]
+\textsc{\Large Learn Notes}\\[0.5cm]
+% Title
+\HRule \\[0.8cm]
+{\huge \bfseries 生产实习学习笔记}\\[0.4cm]
+\HRule \\[0.7cm]
+% Author
+\textsf{\bfseries 计科1906 李腾飞}
+\tableofcontents 
+\vfill
+% Bottom of the page
+{创建日期：2022年7月28日}\\
+{更新日期：\today}
+\end{center}
+\end{titlepage}
+\pagestyle{plain}
+\pagenumbering{Roman}
+\thispagestyle{empty}
+%===正文===
+\pagestyle{fancy}
+\pagenumbering{arabic}
+
+%===第一章===
+\section{LaTeX软件使用指导}
+\subsection{软件下载和安装}
+首先需要下载软件TeXLive2019(尽可能使用2019，不要装以上版本，因为我目前使用2019，没法重现错误)，这个软件比较大，下载地址为：
+
+\url{https://pan.baidu.com/s/1SXUHUEcrV6lENEALVNgH_g}，提取码：ytex
+
+下载后，进行安装，特别注意\emph{安装时间比较长，需要耐心等待}，详细过程参考下面的网页：
+
+\url{https://blog.csdn.net/weixin_45860123/article/details/111185293}
+
+\subsection{使用TeXWorks进行编辑}
+TeXWorks软件是默认的编辑器，左边为编辑区，右边为PDF文件查看器，从左上角下拉框选择XeLaTeX命令进行编译，注意需要编译两次。
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=\textwidth]{texworks.png}
+\caption{TeXWorks} \label{fig:texworks}
+\end{figure}
+
+\subsection{如何使用提供的模板}
+\subsubsection{TexWorks编辑并编译}
+直接双击notes.tex，使用TexWorks打开，从左上角下拉框选择XeLaTeX命令进行编译$2$次，即可生成目标pdf文件，表明安装成功。
+
+\subsection{LaTeX常见知识}
+下面就LaTeX插入数学表达式、图形、定理、表格、算法和代码提供一些例子，多练习几个例子就自动掌握使用方法了。
+
+\subsubsection{数学表达式}
+建议使用AxMath软件，生成LaTeX表达式
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=0.8\textwidth]{axmath.png}
+\caption{AxMath} \label{fig:axmath}
+\end{figure}
+
+行内公式放到\$\$内，行间公式表示如下：
+\begin{align}
+\begin{cases}
+	\min_{\alpha} \frac{1}{2}\sum_{i=1}^n\sum_{j=1}^n\alpha_i\alpha_jl_il_jK(\bm{x}_i,\bm{x}_j) -\sum_{i=1}^n \alpha_i\\
+	\begin{matrix}
+	s.t.&	\sum_{i=1}^n\alpha_il_i = 0	& i=1,2,\cdots ,n \\
+       &	0\leq \alpha_i\leq C	& i=1,2,\cdots ,n	 \\
+\end{matrix}
+\end{cases}
+\end{align}
+
+\subsubsection{定理及其证明}
+\begin{theorem}\label{rotM}
+平面旋转矩阵$ J $只和两向量之间的夹角$ \theta $有关
+\end{theorem}
+\begin{proof}
+$ a_1=Rsin\alpha , b_1=Rcos\alpha~~ .~~ a_2=Rsin\beta ,b_2=Rcos\beta $
+展开  $ a_2 $可以得到
+\begin{align}
+\label{Jc}
+  {J}_c=\begin{bmatrix} cos\theta&-sin\theta\\sin\theta& cos\theta
+\end{bmatrix} 
+\end{align}
+\end{proof}
+
+\subsubsection{图和表}
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=0.9\textwidth]{sample.png}
+\caption{sample} \label{fig:sample}
+\end{figure}
+
+\begin{table}[H]
+\caption{ 中文表}
+\centering
+\begin{tabular}{ll|ll}
+\toprule
+项目 &  取值  &项目 & 取值\\
+\midrule[2pt]
+$NL$ & 1/2/3   &$\theta $     & [0,1]\\
+$L$ & 1000cell    &$\lambda  $    &\{0.1,0.25,0.5,10\} \\
+$\tau$ &[0,1]   &${v_{limit}}$  &  10cell/time-step\\
+ \multirow{2}{*}{\tabincell{c}{$\Omega  $}}  &  \multirow{2}{*}{\tabincell{c}{CCL/NCL/ACL/\\FCL}}&  $DL$  &  0/1/2/3  \\
+ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{算法描述}
+
+\begin{algorithm}[H]
+\caption{算法}\label{algorithm}
+\KwIn{数据集$J(\theta_1, \theta_2, \cdots, \theta_d)$, $\varepsilon$\;}
+\KwOut{全局最小点$\mathbf{\theta}^{(k)}$\;}
+初始化函数参数$\mathbf{\theta}^{0}=(\theta_1 ^{(0)},\theta_2 ^{(0)},\cdots \theta_d ^{(0)})$;
+
+$k\leftarrow 1$\;
+
+\Repeat{$\|\mathbf{\theta}^{(k)} - \mathbf{\theta}^{(k-1)}\| \leq \varepsilon$}{
+	$\theta_1^{(k)} = arg \min_{\theta_1} J(\theta_1, \theta_2^{(k-1)}, \theta_3^{(k-1)}, \cdots, \theta_d^{(k-1)})$ \;
+	
+	\If{cond2}{
+		second if\;
+	}
+	
+	\lIf{cond5}{cond5 true}	
+	
+	\eIf(\tcc*[f]{then comment}){test}{
+		then with a comment\;
+	}(\tcc*[f]{comment in else})
+	{
+		here we are in else\;
+	}
+
+ 	\lFor{i=1 \emph{\KwTo} max}{mark i}
+ 	
+	\ForEach{$e$ in the set}{
+		put $e$ in ${\cal E}$\;
+		mark $e$\;
+	}
+	
+	$\theta_d^{(k)} = arg \min_{\theta_d} J(\theta_1^{(k)}, \theta_2^{(k)}, \theta_3^{(k)}, \cdots, \theta_d)$ \;
+	
+	$k\leftarrow k + 1$\;
+}
+  
+\Return $\mathbf{\theta}^{(k)}$ \;
+\end{algorithm} 
+
+
+\subsubsection{代码描述}
+\begin{lstlisting}[language={c++},
+        numbers=left,
+        numberstyle=\tiny\monaco,
+        basicstyle=\footnotesize\monaco]
+#include<iostream>
+using namespace std;
+ 
+void print(int arr[], int n)
+{  
+    for(int j= 0; j<n; j++)
+	{  
+           cout<<arr[j] <<"  ";  
+        }  
+    cout<<endl;  
+}  
+ 
+void BubbleSort(int arr[], int n)
+{
+    for (int i = 0; i < n - 1; i++)
+	{
+            for (int j = 0; j < n - i - 1; j++)
+	        {
+                    if (arr[j] > arr[j + 1]) 
+			{
+                            int temp = arr[j];
+                            arr[j] = arr[j + 1];
+                            arr[j + 1] = temp;
+                        }
+                 }
+         }
+}
+ 
+int main()
+{  
+    int s[10] = {8,1,9,7,2,4,5,6,10,3};  
+    cout<<"初始序列：";  
+    print(s,10);  
+    BubbleSort(s,10);  
+    cout<<"排序结果：";  
+    print(s,10);  
+    system("pause"); 
+}
+\end{lstlisting}
+
+
+\subsection{编译出现The font Monaco cannot be found错误，如何处理？}
+是因为缺乏字体。字体文件下载地址如下，提取码为：rrqu 
+
+\url{https://pan.baidu.com/s/14_i7Xova3ozFSVeoGXldRg?pwd=rrqu }
+
+Win10系统中在超级管理员权限下执行如下命令(Monaco.ttf同目录)：
+\begin{lstlisting}
+copy Monaco.ttf C:\Windows\Fonts
+\end{lstlisting}
+
+Win10系统中在超级管理员权限下执行如下命令(Monaco.ttf同目录)：
+\begin{lstlisting}
+copy Monaco.ttf C:\Windows\Fonts
+\end{lstlisting}
+
+
+\subsection{总结}
+LaTeX是一个非常有用的排版软件，希望大家学好用好。
+
+
+
+%===参考文献===
+%\addcontentsline{toc}{section}{参考文献}
+%\bibliographystyle{abbrv}     %论文引用格式
+%\bibliography{E:/studio/wrtex/wrtkit/referbib/wholebiblio}
+                         
+\begin{thebibliography}{99}
+\bibitem{A19}
+{\em \color{red}latexstudio.net}. \url{http://www.latexstudio.net}, 2021.
+\end{thebibliography}
+\end{document}
+%===结束===
+
+
+
+History:
+2022-8-20: 依据程勇老师的Note.tex创建；
+
+
+
