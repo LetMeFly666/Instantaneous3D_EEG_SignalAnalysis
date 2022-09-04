@@ -108,6 +108,7 @@ x轴：频率，y轴：时间，z轴：振幅
 + ```Codes/main.py```：主程序，主要负责调用
 + ```Codes/BaseClass.py```：数据类，包括数据、起始截止时间、采样频率等
 + ```Codes/BaseFunction.py```：一些基本的函数功能
++ ```Codes/LetEMD.py```：实现了EEG的EMD分解
 + ```Codes/Visualize.py```：将数据可视化
 + ```Codes/Txt2numpy.py```：读取数据
 + ```Codes/ShowOriginalEEGdata.py```：显示原始EEG
@@ -115,7 +116,7 @@ x轴：频率，y轴：时间，z轴：振幅
 + ```Codes/IMFs2FrequencyDomain.py```：将IMF转换到频域
 + ```Codes/CutoffNoice.py```：将信号中不符合频率范围的部分删除
 + ```Codes/IMF2TimeDomain.py```：将IMF转回时域
-+ ```Codes/ConstructEEG.py```：将IMF构建回EEG（并去除前10s的信号）
++ ```Codes/ConstructEEG.py```：将IMF构建回EEG（并去除前2s和后2s的信号）
 + ```Codes/HHT.py```：通过HHT获得实时频率
 + ```Codes/ShowRealtime3D.py```：显示为实时三维图
 
@@ -123,5 +124,6 @@ x轴：频率，y轴：时间，z轴：振幅
 ## TODO:
 
 + 多种时间的文件的支持（现在只能是固定的4000个数据，并且程序中很多位置使用了绝对值，不好）
++ Noise Xx Ratio
 
 <!-- Get-ChildItem Env: | Select Name | Export-Csv -Path C:/Users/LetMe/Desktop/tmp.txt -NoTypeInformation -->
